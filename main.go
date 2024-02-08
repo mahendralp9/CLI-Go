@@ -31,9 +31,17 @@ func main() {
 		return
 	}
 
+	menu = trimSpaceBehind(menu)
+
+	validate := isMenuExist(theMenu, menu)
+	if validate {
+		fmt.Println("Menu already exist !!")
+		return
+	}
+
 	if menu != "" {
-		var addMenus = append(theMenu, menu)
-		if err := writeFile(path, addMenus); err != nil {
+		var addMenu = append(theMenu, menu)
+		if err := writeFile(path, addMenu); err != nil {
 			fmt.Println("Error writing file : ", err)
 			return
 		}
@@ -86,4 +94,35 @@ func writeFile(path string, addMenus []string) error {
 
 	return nil
 
+}
+
+func isMenuExist(menu []string, addMenu string) bool {
+
+	if menu != nil {
+		for _, c := range menu {
+			if c == addMenu {
+				return true
+			}
+		}
+	}
+
+	return false
+
+}
+
+func trimSpaceBehind(addMenu string) string {
+
+	var blank = ""
+
+	for index, s := range addMenu {
+
+		if index == len(addMenu)-1 {
+			if string(s) == " " {
+				return blank
+			}
+		}
+		blank += string(s)
+	}
+
+	return addMenu
 }
