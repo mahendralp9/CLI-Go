@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var menus = []string{}
@@ -22,8 +23,10 @@ func main() {
 
 	var menu string
 	var listMenu bool
-	flag.StringVar(&menu, "menunya", "", "ini commmand untuk add menu")
-	flag.BoolVar(&listMenu, "list", true, "ini command untuk get list menu")
+	var delMenu string
+	flag.StringVar(&menu, "add", "", "ini commmand untuk add menu")
+	flag.BoolVar(&listMenu, "list", false, "ini command untuk get list menu")
+	flag.StringVar(&delMenu, "delete", "", "ini command untuk delete menu dari list")
 	flag.Parse()
 
 	switch {
@@ -32,6 +35,9 @@ func main() {
 
 	case listMenu:
 		getMenu()
+
+	case delMenu != "":
+		deleteMenu(delMenu)
 	}
 
 }
@@ -147,6 +153,39 @@ func getMenu() {
 		return
 	}
 
-	fmt.Printf("Menu : %#v", theMenu)
+	fmt.Printf("Menu : %+v", theMenu)
 
+}
+
+func deleteMenu(item string) {
+
+	var idxItemToBeDeleted int = -1
+
+	//readfile menu
+	menu, err := readFile(path)
+	if err != nil {
+		fmt.Println("error :", err)
+		return
+	}
+
+	for idx, menuItem := range menu {
+		if menuItem == item {
+			idxItemToBeDeleted = idx
+			break
+		}
+	}
+
+	if idxItemToBeDeleted == -1 {
+		fmt.Println("Menu tidak ditemukan !!")
+		return
+	}
+
+	menu = append(menu[:idxItemToBeDeleted], menu[idxItemToBeDeleted+1:]...)
+
+	if err := writeFile(path, menu); err != nil {
+		fmt.Println("Error writing file : ", err)
+		return
+	}
+
+	fmt.Printf("Menus: %s\n", strings.Join(menu, " ,"))
 }
