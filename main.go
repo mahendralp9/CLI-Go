@@ -14,20 +14,32 @@ var menus = []string{}
 var filePath = "D:/GitWork/CLI-Golang"
 var path = filepath.Join(filePath, "CLI.json")
 
+type Menus struct {
+	Menu []string
+}
+
 func main() {
 
 	var menu string
 	flag.StringVar(&menu, "menunya", "", "ini commmand untuk add menu")
 	flag.Parse()
 
-	var addMenus = append(menus, menu)
-
-	if err := writeFile(path, addMenus); err != nil {
-		fmt.Println("Error writing file : ", err)
+	//readfile menu
+	theMenu, err := readFile(path)
+	if err != nil {
+		fmt.Println("error :", err)
+		return
 	}
 
-	//readfile menu
-	// menus := readFile(path)
+	if menu != "" {
+		var addMenus = append(theMenu, menu)
+		if err := writeFile(path, addMenus); err != nil {
+			fmt.Println("Error writing file : ", err)
+			return
+		}
+	}
+
+	fmt.Printf("Menus: %s\n", theMenu)
 
 }
 
@@ -42,20 +54,17 @@ func readFile(path string) ([]string, error) {
 			return menus, nil
 		}
 
-		json.Unmarshal(content, &menus)
-
 		return nil, err
 
 	}
 
-	return menus, nil
+	var m Menus
+	json.Unmarshal(content, &m)
+
+	return m.Menu, nil
 }
 
 func writeFile(path string, addMenus []string) error {
-
-	type Menus struct {
-		Menu []string
-	}
 
 	menyu := Menus{
 		Menu: addMenus,
