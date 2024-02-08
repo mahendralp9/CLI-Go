@@ -21,33 +21,18 @@ type Menus struct {
 func main() {
 
 	var menu string
+	var listMenu bool
 	flag.StringVar(&menu, "menunya", "", "ini commmand untuk add menu")
+	flag.BoolVar(&listMenu, "list", true, "ini command untuk get list menu")
 	flag.Parse()
 
-	//readfile menu
-	theMenu, err := readFile(path)
-	if err != nil {
-		fmt.Println("error :", err)
-		return
+	switch {
+	case menu != "":
+		addMenu(menu)
+
+	case listMenu:
+		getMenu()
 	}
-
-	menu = trimSpaceBehind(menu)
-
-	validate := isMenuExist(theMenu, menu)
-	if validate {
-		fmt.Println("Menu already exist !!")
-		return
-	}
-
-	if menu != "" {
-		var addMenu = append(theMenu, menu)
-		if err := writeFile(path, addMenu); err != nil {
-			fmt.Println("Error writing file : ", err)
-			return
-		}
-	}
-
-	fmt.Printf("Menus: %s\n", theMenu)
 
 }
 
@@ -125,4 +110,43 @@ func trimSpaceBehind(addMenu string) string {
 	}
 
 	return addMenu
+}
+
+func addMenu(menu string) {
+
+	//readfile menu
+	theMenu, err := readFile(path)
+	if err != nil {
+		fmt.Println("error :", err)
+		return
+	}
+
+	menu = trimSpaceBehind(menu)
+
+	validate := isMenuExist(theMenu, menu)
+	if validate {
+		fmt.Println("Menu already exist !!")
+		return
+	}
+
+	if menu != "" {
+		var addMenu = append(theMenu, menu)
+		if err := writeFile(path, addMenu); err != nil {
+			fmt.Println("Error writing file : ", err)
+			return
+		}
+	}
+}
+
+func getMenu() {
+
+	//readfile menu
+	theMenu, err := readFile(path)
+	if err != nil {
+		fmt.Println("error :", err)
+		return
+	}
+
+	fmt.Printf("Menu : %#v", theMenu)
+
 }
