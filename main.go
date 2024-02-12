@@ -24,9 +24,13 @@ func main() {
 	var menu string
 	var listMenu bool
 	var delMenu string
+	var upMenu string
+	var newValue string
 	flag.StringVar(&menu, "add", "", "ini commmand untuk add menu")
+	flag.StringVar(&upMenu, "update", "", "ini command untuk update menu")
 	flag.BoolVar(&listMenu, "list", false, "ini command untuk get list menu")
 	flag.StringVar(&delMenu, "delete", "", "ini command untuk delete menu dari list")
+	flag.StringVar(&newValue, "value", "", "input value barunya dengan ini")
 	flag.Parse()
 
 	switch {
@@ -38,6 +42,9 @@ func main() {
 
 	case delMenu != "":
 		deleteMenu(delMenu)
+
+	case upMenu != "":
+		updateMenu(upMenu, newValue)
 	}
 
 }
@@ -144,6 +151,45 @@ func addMenu(menu string) {
 	}
 }
 
+func updateMenu(item string, newValue string) {
+
+	var idxItemToBeEdited int = -1
+
+	//readfile menu
+	menu, err := readFile(path)
+	if err != nil {
+		fmt.Println("error :", err)
+		return
+	}
+
+	for idx, menuItem := range menu {
+		if menuItem == item {
+			idxItemToBeEdited = idx
+			break
+		}
+	}
+
+	if idxItemToBeEdited == -1 {
+		fmt.Println("Menu tidak ditemukan !!")
+		return
+	}
+
+	if newValue == " " {
+		fmt.Println("Menu tidak boleh kosong !!")
+		return
+	}
+
+	menu[idxItemToBeEdited] = newValue
+
+	if err := writeFile(path, menu); err != nil {
+		fmt.Println("Error writing file : ", err)
+		return
+	}
+
+	fmt.Printf("New Menu: %s\n", strings.Join(menu, ", "))
+
+}
+
 func getMenu() {
 
 	//readfile menu
@@ -153,7 +199,7 @@ func getMenu() {
 		return
 	}
 
-	fmt.Printf("Menu : %+v", theMenu)
+	fmt.Printf("Menus: %s", strings.Join(theMenu, ", "))
 
 }
 
@@ -187,5 +233,5 @@ func deleteMenu(item string) {
 		return
 	}
 
-	fmt.Printf("Menus: %s\n", strings.Join(menu, " ,"))
+	fmt.Printf("Menus: %s\n", strings.Join(menu, ", "))
 }
